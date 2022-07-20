@@ -1,4 +1,5 @@
 const { Builder, By, until } = require('selenium-webdriver');
+require("dotenv").config();
 
 const userData = {
   name: process.env.name,
@@ -7,9 +8,12 @@ const userData = {
   psw: process.env.psw
 };
 
+(async () => {
+  await autoCheck(userData);
+})();
 setInterval(() => {
   const date = new Date();
-  if (date.getHours() === 1 || date.getHours() === 9 || date.getHours() === 10 || date.getHours() === 11) {
+  if (date.getHours() === 1 || date.getHours() === 2 || date.getHours() === 3 || date.getHours() === 9 || date.getHours() === 10 || date.getHours() === 11) {
     (async () => {
       await autoCheck(userData);
     })();
