@@ -1,29 +1,20 @@
 const { Builder, By, until } = require('selenium-webdriver');
-const express = require('express');
-const helmet = require('helmet');
-const app = express();
-const cors = require('cors');
-require("dotenv").config();
 
-app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+const userData = {
+  name: process.env.name,
+  school: process.env.school,
+  birth: process.env.birth,
+  psw: process.env.psw
+};
 
-app.get("/", (req, res) => {
-  const userData = {
-    name: process.env.name,
-    school: process.env.school,
-    birth: process.env.birth,
-    psw: process.env.psw
-  };
-
-  (async () => {
-    await autoCheck(userData);
-  })();
-});
-
-app.listen(process.env.PORT || 8080);
+setInterval(() => {
+  const date = new Date();
+  if (date.getHours() === 1 || date.getHours() === 9 || date.getHours() === 10 || date.getHours() === 11) {
+    (async () => {
+      await autoCheck(userData);
+    })();
+  }
+}, 3600000); // 1시간
 
 const autoCheck = async ({ name, school, birth, psw }) => {
   let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
