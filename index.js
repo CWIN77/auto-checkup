@@ -1,5 +1,7 @@
-const { Builder, By, until } = require('selenium-webdriver');
-require("dotenv").config();
+import { Builder, By, until } from "selenium-webdriver";
+import dotenv from "dotenv";
+import isOnline from 'is-online';
+dotenv.config();
 
 const userData = {
   name: process.env.name,
@@ -7,18 +9,6 @@ const userData = {
   birth: process.env.birth,
   psw: process.env.psw
 };
-
-(async () => {
-  await autoCheck(userData);
-})();
-setInterval(() => {
-  const date = new Date();
-  if (date.getHours() === 1 || date.getHours() === 2 || date.getHours() === 3 || date.getHours() === 9 || date.getHours() === 10 || date.getHours() === 11) {
-    (async () => {
-      await autoCheck(userData);
-    })();
-  }
-}, 3600000); // 1시간
 
 const autoCheck = async ({ name, school, birth, psw }) => {
   let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
@@ -62,6 +52,21 @@ const autoCheck = async ({ name, school, birth, psw }) => {
 
     const confirmBtn = await driver.wait(until.elementLocated(By.css('#btnConfirm')));
     await confirmBtn.click();
-    await driver.quit();
+    setTimeout(async () => {
+      await driver.quit();
+    }, 1000);
   }, 1000);
 };
+
+const startAutoCheckup = async () => {
+  await autoCheck(userData);
+  setInterval(async () => {
+    const online = await isOnline();
+    const date = new Date();
+    if (online && 0 < date.getDay() && date.getDay() < 6 && 1 <= date.getHours() && date.getHours() <= 11) {
+      await autoCheck(userData);
+    }
+  }, 3600000); // 1시간
+}
+
+startAutoCheckup();
