@@ -11,62 +11,67 @@ const userData = {
 };
 
 const autoCheck = async ({ name, school, birth, psw }) => {
-  let driver = await new Builder('./chromedriver').forBrowser('chrome').build();
+  const driver = await new Builder('./chromedriver').forBrowser('chrome').build();
   await driver.get('https://hcs.eduro.go.kr/#/relogin');
   await driver.wait(until.elementLocated(By.css('#btnConfirm2'))).click();
   await driver.wait(until.elementLocated(By.css('#schul_name_input'))).click();
   await driver.findElement(By.xpath(`//*[@id="sidolabel"]/option[2]`)).click();
   await driver.findElement(By.xpath(`//*[@id="crseScCode"]/option[5]`)).click();
-  await driver.wait(until.elementLocated(By.css('#orgname'))).click();
-  await driver.actions().sendKeys(school).perform();
-  await driver.wait(until.elementLocated(By.css('.searchBtn'))).click();
-  await driver.wait(until.elementLocated(By.css('.layerSchoolSelectWrap .layerSchoolArea li a'))).click();
-  const selectBtn = await driver.wait(until.elementLocated(By.css('.layerFullBtn')));
-  await selectBtn.click();
-  await driver.wait(until.elementLocated(By.css('#user_name_input'))).click();
-  await driver.actions().sendKeys(name).perform();
-  await driver.wait(until.elementLocated(By.css('#birthday_input'))).click();
-  await driver.actions().sendKeys(birth).perform();
-  const pswBtn = await driver.wait(until.elementLocated(By.css('.keyboard-icon')));
-  await pswBtn.click();
-
-  const psw1 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[0]}"]`)));
-  const psw2 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[1]}"]`)));
-  const psw3 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[2]}"]`)));
-  const psw4 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[3]}"]`)));
-  await psw1.click();
-  await psw2.click();
-  await psw3.click();
-  await psw4.click();
-
-  const doneBtn = await driver.wait(until.elementLocated(By.css('#btnConfirm')));
-  await doneBtn.click();
-
   setTimeout(async () => {
-    const checkStartBtn = await driver.wait(until.elementLocated(By.css('.survey-button')));
-    await checkStartBtn.click();
+    const schoolBtn = await driver.wait(until.elementLocated(By.css('.layerSchoolSelectWrap .layerSchoolTable tbody tr td .searchArea')));
+    await schoolBtn.click();
+    await driver.actions().sendKeys(school).perform();
+    await driver.wait(until.elementLocated(By.css('.searchBtn'))).click();
+    await driver.wait(until.elementLocated(By.css('.layerSchoolSelectWrap .layerSchoolArea li a'))).click();
+    const selectBtn = await driver.wait(until.elementLocated(By.css('.layerFullBtn')));
+    await selectBtn.click();
+    await driver.wait(until.elementLocated(By.css('#user_name_input'))).click();
+    await driver.actions().sendKeys(name).perform();
+    await driver.wait(until.elementLocated(By.css('#birthday_input'))).click();
+    await driver.actions().sendKeys(birth).perform();
+    const pswBtn = await driver.wait(until.elementLocated(By.css('.keyboard-icon')));
+    await pswBtn.click();
 
-    await driver.wait(until.elementLocated(By.css('#survey_q1a1'))).click();
-    await driver.wait(until.elementLocated(By.css('#survey_q2a1'))).click();
-    await driver.wait(until.elementLocated(By.css('#survey_q3a1'))).click();
+    const psw1 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[0]}"]`)));
+    const psw2 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[1]}"]`)));
+    const psw3 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[2]}"]`)));
+    const psw4 = await driver.wait(until.elementLocated(By.css(`[class*="transkey"] [aria-label="${psw[3]}"]`)));
+    await psw1.click();
+    await psw2.click();
+    await psw3.click();
+    await psw4.click();
 
-    const confirmBtn = await driver.wait(until.elementLocated(By.css('#btnConfirm')));
-    await confirmBtn.click();
+    const doneBtn = await driver.wait(until.elementLocated(By.css('#btnConfirm')));
+    await doneBtn.click();
+
     setTimeout(async () => {
-      await driver.quit();
+      try {
+        const checkStartBtn = await driver.wait(until.elementLocated(By.css('.survey-button')));
+        await checkStartBtn.click();
+
+        await driver.wait(until.elementLocated(By.css('#survey_q1a1'))).click();
+        await driver.wait(until.elementLocated(By.css('#survey_q2a1'))).click();
+        await driver.wait(until.elementLocated(By.css('#survey_q3a1'))).click();
+
+        const confirmBtn = await driver.wait(until.elementLocated(By.css('#btnConfirm')));
+        await confirmBtn.click();
+        setTimeout(async () => {
+          await driver.quit();
+        }, 1000);
+      } catch {
+        await driver.quit();
+      }
     }, 1000);
-  }, 1000);
+  }, 500);
 };
 
-const startAutoCheckup = async () => {
+(async () => {
   await autoCheck(userData);
-  setInterval(async () => {
-    const online = await isOnline();
-    const date = new Date();
-    if (online && 0 < date.getDay() && date.getDay() < 6 && 1 <= date.getHours() && date.getHours() <= 11) {
-      await autoCheck(userData);
-    }
-  }, 3600000); // 1시간
-}
-
-startAutoCheckup();
+})();
+setInterval(async () => {
+  const online = await isOnline();
+  const date = new Date();
+  if (online && 0 < date.getDay() && date.getDay() < 6 && 1 <= date.getHours() && date.getHours() <= 11) {
+    await autoCheck(userData);
+  }
+}, 3600000); // 1시간
