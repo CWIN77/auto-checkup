@@ -71,7 +71,7 @@ const autoCheck = async ({ name, school, birth, psw }) => {
 setInterval(async () => {
   const online = await isOnline();
   const date = new Date();
-  if (online && 0 < date.getDay() && date.getDay() < 6 && 1 <= date.getHours() && date.getHours() <= 11) {
+  if (online && 0 <= date.getHours() && date.getHours() <= 11) {
     await autoCheck(userData);
   }
 }, 3600000); // 1시간
