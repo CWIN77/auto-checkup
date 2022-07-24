@@ -65,14 +65,14 @@ const autoCheck = async ({ name, school, birth, psw }) => {
   }, 500);
 };
 
-let isDone = true;
+let isDone = false;
 setInterval(async () => {
   const online = await isOnline();
   const date = new Date();
-  if (isDone && online && 1 <= date.getHours() && date.getHours() <= 11) {
-    isDone = false;
+  if (!isDone && online && 1 <= date.getHours() && date.getHours() <= 11) {
+    isDone = true;
     await autoCheck(userData);
   } else if (!(online && 1 <= date.getHours() && date.getHours() <= 11)) {
-    isDone = true;
+    isDone = false;
   }
 }, 600000); // 10분
