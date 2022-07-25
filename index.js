@@ -69,10 +69,12 @@ let isDone = false;
 setInterval(async () => {
   const online = await isOnline();
   const date = new Date();
-  if (!isDone && online && 1 <= date.getHours() && date.getHours() <= 11) {
-    isDone = true;
-    await autoCheck(userData);
-  } else if (!(online && 1 <= date.getHours() && date.getHours() <= 11)) {
-    isDone = false;
+  if (online) {
+    if (!isDone && 1 <= date.getHours() && date.getHours() <= 11) {
+      isDone = true;
+      await autoCheck(userData);
+    } else if (!(1 <= date.getHours() && date.getHours() <= 11)) {
+      isDone = false;
+    }
   }
 }, 600000); // 10분
