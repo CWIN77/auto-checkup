@@ -70,10 +70,10 @@ setInterval(async () => {
   const online = await isOnline();
   const date = new Date();
   if (online) {
-    if (!isDone && 0 <= date.getHours() && date.getHours() <= 11) {
+    if (!isDone && 2 <= date.getHours() && date.getHours() <= 11) {
       isDone = true;
       await autoCheck(userData);
-    } else if (!(0 <= date.getHours() && date.getHours() <= 11)) {
+    } else if (!(2 <= date.getHours() && date.getHours() <= 11)) {
       isDone = false;
     }
   }
